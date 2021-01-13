@@ -2,6 +2,15 @@ package main
 
 import "fmt"
 
+func fibonacciWithChannel(n int, c chan int) {
+	x, y := 0, 1
+	for i := 0; i < n; i++ {
+		c <- x
+		x, y = y, x+y
+	}
+	close(c)
+}
+
 func fibonacciWithSlices() func(int) int {
 	return func(x int) int {
 		fnumbers := make([]int, x+1, x+2)
@@ -26,6 +35,12 @@ func fibonacciWithRecursion(n int) int {
 }
 
 func main() {
+	c := make(chan int, 10)
+	go fibonacciWithChannel(cap(c), c)
+	for i := range c {
+		fmt.Println(i)
+	}
+
 	f := fibonacciWithSlices()
 	for i := 0; i < 10; i++ {
 		fmt.Println(f(i))
