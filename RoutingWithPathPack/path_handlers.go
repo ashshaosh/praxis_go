@@ -1,0 +1,60 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"path"
+	"strings"
+)
+
+type pathResolver struct {
+	handlers map[string]http.HandlerFunc
+}
+
+func (p *pathResolver) Add(path string, handler http.HandlerFunc) {
+	p.handlers[path] = handler
+}
+func (p *pathResolver) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	check := req.Method + " " + req.URL.Path
+	for pattern, handlerFunc := range p.handlers {
+		if ok, err := path.Match(pattern, check); ok && err == nil {
+			handlerFunc(res, req)
+			return
+		} else if err != nil {
+			fmt.Fprint(res, err)
+		}
+	}
+	http.NotFound(res, req)
+}
+
+func main() {
+	pr := newPathResolver()
+	pr.Add("GET /hello", hello)
+	pr.Add("* /bye/*", bye)
+	http.ListenAndServe(":8080", pr)
+}
+
+func newPathResolver() *pathResolver {
+	return &pathResolver{make(map[string]http.HandlerFunc)}
+}
+
+func hello(res http.ResponseWriter, req *http.Request) {
+	query := req.URL.Query()
+	name := checkStringEmptiness(query.Get("name"))
+	fmt.Fprint(res, "Hello, ", name)
+}
+
+func bye(res http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	parts := strings.Split(path, "/")
+	name := checkStringEmptiness(parts[2])
+
+	fmt.Fprint(res, "Bye, ", name)
+}
+
+func checkStringEmptiness(str string) string {
+	if str == "" {
+		return "Captain Nemo"
+	}
+	return str
+}
