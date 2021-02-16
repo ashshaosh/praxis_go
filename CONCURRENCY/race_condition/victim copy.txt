@@ -1,0 +1,157 @@
+Sign in
+Get started
+basecs
+FUNDAMENTALS
+DATA STRUCTURES
+ALGORITHMS
+THEORY IN PRACTICE
+Top highlight
+Hashing Out Hash Functions
+Vaidehi Joshi
+Vaidehi Joshi
+Follow
+Apr 24, 2017 · 11 min read
+
+
+
+Over the course of the past few months, I’ve noticed one trait about each new concept that I learn in computer science: everything has its drawbacks.
+In fact, I’d guess that this is actually a trait of software in general and, to be honest, any creative and technical craft. Whether we’re writing just a little bit of code, or architecting a large, complex system, we always have many tools to choose from. The trick, of course, is knowing which tool is the right one for the job. And in order to really get good at the decision-making process of choosing the right tool, we have know what its benefits and drawbacks are in order to make a fair assessment.
+Hash tables, we recently discovered, are really great options for storing and retrieving specific data, quickly. They’re not always the best tool for the job — for example, they’re not great for finding ordered data — but sometimes, they can make our lives a lot easier. We already know that a hash table is made up of two parts: an array that stores all of the data that we’re hashing, and the hash function that decides where all of that data will go. However, hash tables do intrinsically have some issues of their own, and the usefulness of a hash table is tied directly to its hash function. Hash functions can be somewhat complicated, particularly if you don’t know the different types of functions that are out there.
+So, let’s find out more about hash functions, how they work, and their strengths and weakness. Hopefully, this will help us understand when exactly they can help us out!
+Hash table, hash table, are you any good?
+The best way to decide whether something is the solution to your problem is by first understanding what that thing does well. In other words, in order for us to decide when hash tables are desirable (and, of course, when they’re not), we need to look at what makes a good hash table, and then use that to help us decide if we’re on the right track.
+So, we have to answer one question: what makes a good hash table? Luckily, the answer to this is, for the most part, pretty simple.
+Image for post
+What makes a good hash table?
+Ultimately, the usability of a hash table to solve a store-and-later-search-through-all-this-data problem hinges on how good of a hash function the hash table has.
+Let’s break that statement down even further. A good hash table must always:
+have a hash function that is easy to compute
+have a hash function that avoids collisions
+have a hash function that returns the same key, every single time, when given a value, and be able to use up all of the input data
+So, we can take these at face value…but I think that it’s better to ask why.
+Well, a hash table should have an easy-to-compute function because anything that’s too hard to compute will take up too much time an space! An expensive function defeats the purpose of finding an efficient data structure, so this actually makes sense. A hash function should be able to handle all the data and store all of it when it’s inputted, because if it doesn’t…well, that would also defeat the purpose of the data structure being able to store mass quantities of data very quickly! And if the hash function didn’t return the same key every time? Well, that would be very bad, because we’d never be able to retrieve the data after we stored it, because we could never be sure where things are!
+Okay, so that just leaves collisions. You might remember from last week that a collision occurs when two elements are supposed to be inserted at the same place in an array.
+In the example below, the hash function is fairly simple: it takes the number of characters in the word, sums them, and then divides that character total by the size of the hash table (which is 10). Using the modulo operator, it uses the remainder from that division to find the correct hash bucket for the item we’re trying to store. Notice that we run into a collision with the last two items, since we can’t store two of them in the same place!
+Image for postImage for post
+Collisions occur whenever a hash function generates the same key for two elements
+Almost all hash functions will encounter a collision at some point or another. The only situation where this is not the case is for a perfect hash function, where every single input value maps to a unique hash bucket, and no two values end up at the same key in the hash. But perfect hash functions are rare, because we usually don’t know how big our dataset will be before we write a hash function!
+The tl;dr here is that we have to understand how to handle collisions, because they are almost certainly going to happen. This is probably the most important thing to understand about hash functions, because they each need to account for collisions.
+Collision resolution tactics
+There are a handful of ways to handle collisions in a hash function, and the important thing to remember that none of them is necessarily the “right tactic” to use. It all depends on your dataset, the size of your hash table, and what operations you know you’ll want to perform on the table later on.
+Let’s take a look at two of the most common collisions resolution tactics used in hashing functions.
+Linear Probing
+One way of handling a collisions in a hash function is by just looking for the next empty hash bucket nearby! If this sounds simple…well, that’s because it is! Don’t worry, I’m going to complicate it a little more in a minute.
+The idea here is that if a collision occurs, and two elements are determined to live at the same spot in a hash table, a hash function can simply go to the next empty bucket over, and add the element there. This is a kind of rehashing, and this technique is known as linear probing.
+The interesting thing about linear probing is that if the next hash bucket is also filled by an element, the hash function will just continue to probe through the hash table until it finds an empty bucket, cycling back if necessary.
+This means that if we’re at the end of the hash table and no buckets are empty, the function will just loop back around to the beginning of the table, effectively probing through the table until it finds an available bucket for the element!
+Image for postImage for post
+Linear probing
+However, there’s a downside that comes with linear probing. (I said I was going to complicate things, didn’t I?!). The issue with this specific technique is that the act of simply moving over to the next available hash bucket and inserting an element at the “next free space” leads to something called clustering.
+We haven’t talked yet about what clustering is, so let’s figure that out first!
+The easiest way of thinking about clustering is by assessing where all of the data lives in the hash table.
+Image for postImage for post
+Clustered vs. well-balanced tables
+If all of our data is stuffed into one area of the hash table, we can say that our data is clustered in one area, or all grouped together in one place.
+On the other hand, if our data is spread across the table, across many different hash buckets, and spans the entire range of the table, we can say that our hash table is well-spaced.
+Clustering is a detrimental thing for hash tables. In fact, if a table is clustered, that means that it’s poorly-designed by definition. And usually, this is a sign that our hash function has an internal problem within it. Generally there are two issues in a hash function that lead to clustering: either our hash function isn’t using up the entire hash table range, or it’s not spreading data evenly across the hash buckets of our hash table. Both of these two things will lead to clustering and, as it turns out, using linear probing as a collision resolution technique can sometimes cause both of these things to happen, which leads to a clustered table.
+Of course, this again depends on our dataset. If we have a lot of elements that are ending up at one hash bucket, and we use linear probing to solve the problem of collision, all of the buckets around the one that was filled up to begin with will start to get populated, really quickly, and we’ll end up with a clustered table! However, if we’ve designed a good hashing function, and our table is big enough to accommodate our dataset, then linear probing can be a great solution for handling collisions.
+Chaining
+The second form of implementing collision resolution within a hash function involves changing the structure of the hash function itself! But don’t stress — we’re already familiar with the stuff we’re about to talk about, so we’ll be total pro’s.
+Rather than having to deal with the downsides of linear probing and having to solve the problem of clustering, it would be great if we could just store multiple things in one hash bucket. And with the process of chaining, that’s exactly what we can do!
+In order to implement chaining, the hash table has to be restructured so that multiple elements can be stored at one key. Hopefully, you’ve already got an idea in your head about what we could use here: a handy dandy linked list!
+Instead of storing a single item at each hash bucket, we can chain multiple elements together so that each key of the table has a pointer that references a linked list.
+This makes adding a single element easy — even if there is a collision (which won’t even be an issue anymore)! We just have to add it to the front of the linked list at the appropriate hash bucket.
+Image for postImage for post
+Chaining
+Are you ready for a slight complication? It turns out that there’s a downside to chaining, too. And you might already see it coming: searching through a linked list takes a long time. In fact, it takes exactly as much time as there are elements — or, in other words, it takes O(n) time.
+Again, whether or not chaining is a good approach to collision resolution all boils down to our hash function.If our hash function takes in words but puts all 50% of the words in one single hash bucket, we haven’t really solved our problem, because now have a long linked list we’ll have to search through, and we don’t have our quick hash-access time anymore!
+Image for postImage for post
+Chaining still averages out to a constant search time
+However, if our hash function does a good job of distributing elements throughout the hash table, then we’ll be okay. In fact, if our hash function distributes any collisions evenly throughout the hash table, that means that we’ll never end up with one long linked list that’s bigger than everything else. Instead, we should have approximately the same size of linked lists at any hash bucket where there is a collision.
+The great thing about this is that, with a good hash function, chaining still averages out to have a search time of O(1), or constant lookup time.
+Compared to linear probing, chaining is a completely different approach with its own benefits and drawbacks. However, one fact does hold to be true in both of these two approaches: if our hash function is good, both of these can be powerful techniques. But if it’s not, well, we’ll have to deal with some sort of fallout, in both cases.
+Every tool has its pros and its cons, and this is certainly the case when it comes to collision resolution!
+The power is all in the function
+A good hash function is really what makes a strong implementation of a hash table. I love the way that Professor Ananda Gunawardena explains this in his introductory lecture on hashing:
+How do we pick a good hash function? How do we deal with collisions?
+The problem of storing and retrieving data in O(1) time comes down to answering the above questions. Picking a “good” hash function is key to successfully implementing a hash table. What we mean by “good” is that the function must be easy to compute and avoid collisions as much as possible. If the function is hard to compute, then we lose the advantage gained for lookups in O(1). Even if we pick a very good hash function, we still will have to deal with “some” collisions.
+If we can remember these two rules that we talked about earlier, and that Professor Gunawarden highlights again here, it’s a lot easier to decide if a hash table is the right tool for the job.
+Sometimes, when dealing with sorted data or chunks of data that need to be retrieved at once, hash tables might be a poor choice. However, with a good hash function, they can prove to be incredibly powerful. As we saw in our example last week, hash tables are all over the place in the real world.
+And, as it turns out, they’re even in your computer — surprise! Unix and Linux operating systems use an internal hash table in order to store the contents of all the directories that are referenced by the environmental PATH variable. If you’ve ever used a version of the rehash command, what you were really doing when you ran that command was recomputing and rehashing the system’s internal hash table!
+A lot of low level programming languages already have implementations of hash tables that come with the language, out of the box. Java, for example, has it’s very own HashTable class, which has been used to by Java programmers to solve lots of complex problems.
+My favorite example of implementing a hash table structure to solve a computer science problem is a spell checker. Remember those little red squiggly lines that used to be so annoying (but helpful!) in MicrosoftWord, back in the day? We could easily implement that with a hash table.
+First, we’d have to pass all the words in the dictionary into a hashing function. After that, anytime someone finished typing a word, we could take that word, and pass it to our hash function. If the function returned a hash bucket key, that would mean that the word existed in the hash table, so we’d know that it was spelled correctly. If no key was returned, we’d know that the word didn’t exist in the dictionary, and was either not a word or spelled incorrectly.
+But the best part of this? Checking one word in a dictionary of words would take a constant amount of time — no matter how big the dictionary happened to be! Just for fun, I looked up how many words are in the Oxford English Dictionary at the moment: it turns out that, in The Second Edition, there are 171,476 words. Thank goodness for that O(1) search time!
+Image for postImage for post
+Using a hash table to implement a spell checker
+Now that you know all about hash tables and good hashing functions, you’re fully equipped to solve whatever tough hash problems that might lay ahead you. Happy hashing!
+Resources
+Hash functions are super-well researched, and you can get deep into the mathematics behind how they work. If you’re as fascinated by them as I am, then you’ll enjoy the resources below!
+Hash Function, Wolfram Mathworld
+Dictionaries and Hash Tables, Professor Sinisa Todorovic
+Linear Probing Hash Tables, Department of Computer Science, RMIT University
+Problem Solving with Algorithms and Data Structures: Hashing, Interactive Python
+Hash Tables, Professors Robert Sedgewick & Kevin Wayne
+Introduction to Hashing, Professor Ananda Gunawardena
+basecs
+Exploring the basics of computer science, every Monday, for…
+
+Follow
+1.98K
+
+11
+Data Structures
+Programming
+Computer Science
+Code
+JavaScript
+1.98K claps
+
+11 responses
+
+
+
+Vaidehi Joshi
+WRITTEN BY
+Vaidehi Joshi
+Follow
+Writing words, writing code. Sometimes doing both at once.
+basecs
+basecs
+
+Follow
+Exploring the basics of computer science, every Monday, for a year.
+More From Medium
+Data Lake
+Kunal Saini in The Startup
+
+Using form_tag and params to create a search or render a sorted view in Rails
+Tracie Masek
+
+Working with operators in Python
+Desira Wijesundara
+
+Iterables vs Iterators in Python — Understand How They Work
+Fahadul Shadhin in Python in Plain English
+
+Advantages of Using a Preprocessor (Sass) in CSS
+Cem Eygi in The Startup
+
+Install Mac on WSL2 => Prepare for IOs Editing
+Homan Huang
+
+How to solve the Knapsack Problem with dynamic programming
+Fabian Terh
+
+How To Set Up JetBrains Team Tools
+Tommi Venemies
+
+Learn more.
+Medium is an open platform where 170 million readers come to find insightful and dynamic thinking. Here, expert and undiscovered voices alike dive into the heart of any topic and bring new ideas to the surface. Learn more
+Make Medium yours.
+Follow the writers, publications, and topics that matter to you, and you’ll see them on your homepage and in your inbox. Explore
+Share your thinking.
+If you have a story to tell, knowledge to share, or a perspective to offer — welcome home. It’s easy and free to post your thinking on any topic. Write on Medium
+About
+Help
+Legal
