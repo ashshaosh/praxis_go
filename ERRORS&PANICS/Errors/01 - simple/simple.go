@@ -15,7 +15,7 @@ func main() {
 	// 	fmt.Printf("Concatinated line: '%s...'\n", result) // \n on the end is to elliminate %-sign in output?
 	// }
 
-	//sweet rewrite
+	//sweet rewrite. As Concat returns usefull value with error - empty string, no need to check and print something else
 	rresult, _ := Concat(getArgs()...)
 	fmt.Printf("Conrtgrtgnred strings: '%s'\n", rresult)
 }
