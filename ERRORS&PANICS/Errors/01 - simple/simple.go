@@ -20,17 +20,22 @@ func main() {
 	fmt.Printf("Conrtgrtgnred strings: '%s'\n", rresult)
 }
 
-func getArgs() (parts []string) {
-	return os.Args[1:]
-}
-
 // Concat the shit
 // F gets any quantity of strings and returns one + error
 func Concat(parts ...string) (string, error) {
+	var e error = nil // nil error
+	s := ""           // empty string
 	if len(parts) == 0 {
-		return "", errors.New("No strings to work with") // empty string and new error
+		e = errors.New("No strings to work with") // !nil error
+		fmt.Printf("well... %s\n", e)
+		//return "", e // empty string and new error
 	}
-	return strings.Join(parts, " "), nil // joined string and nil as error
+	s = strings.Join(parts, " ") // fill string with args
+	return s, e
+}
+
+func getArgs() (parts []string) {
+	return os.Args[1:]
 }
 
 func demoConcat() {
