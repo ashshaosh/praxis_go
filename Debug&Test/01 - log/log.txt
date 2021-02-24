@@ -1,0 +1,2 @@
+crab 2021/02/24 13:59:45 simple.go:13: Usual
+crab 2021/02/24 13:59:45 simple.go:14: Fatal
