@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"net/http"
 	"text/template"
 	"time"
@@ -34,8 +36,16 @@ func displayPage(w http.ResponseWriter, r *http.Request) {
 		Date:    time.Now(),
 	}
 
+	var bufr bytes.Buffer                // buffer to write parse result to
+	err := ecoTemplate.Execute(&bufr, p) // try to parse
+	if err != nil {
+		fmt.Fprint(w, "Error here")
+		return
+	}
+	bufr.WriteTo(w) // post buffer to ResponseWriter
+
 	//t := parseTemplateFile("template_2.html", "templates", funcMap)
-	ecoTemplate.Execute(w, p)
+	//ecoTemplate.Execute(w, p)
 }
 
 func parseTemplateFile(name, folder string, funcs template.FuncMap) *template.Template {
