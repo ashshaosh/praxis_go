@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{.Title}}</title>
+  </head>
+  <body>
+    <h1>{{.Title}}</h1>
+    <p>{{.Content}}</p>
+    <a href="/user?id={{.Id}}">{{.Id}}</a>
+    <!-- Will become <a href="/user?id={{.Id | urlquery}}">{{.Id | html}}</a> -->
+    <p>{{.Date | dateFormat "Jan 2, 2006"}}</p>
+    <p>{{.Date | dateFormat "2006.01.02"}}</p>
+  </body>
+</html>
